@@ -9,8 +9,8 @@ def register(request):
         form = RegisterForm(request.POST)
         if form.is_valid():
             user = form.save()
-            login(request, user)  # auto-login after registration (optional)
-            return redirect('dashboard')  # or wherever you want to redirect
+            login(request, user)
+            return redirect('dashboard')
     else:
         form = RegisterForm()
     return render(request, 'product/register.html', {'form': form})
