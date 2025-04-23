@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import get_object_or_404, render, redirect
 from .models import Category, Product
 from .forms import CategoryForm, ProductForm, RegisterForm
 from django.contrib.auth.decorators import login_required
@@ -55,3 +55,43 @@ def add_product(request):
     else:
         form = ProductForm()
     return render(request, 'product/add_product.html', {'form': form})
+
+@login_required
+def edit_category(request, id):
+    category = get_object_or_404(Category, id=id, vendor=request.user)
+    if request.method == 'POST':
+        form = CategoryForm(request.POST, instance=category)
+        if form.is_valid():
+            form.save()
+            return redirect('category_list')
+    else:
+        form = CategoryForm(instance=category)
+    return render(request, 'product/edit_category.html', {'form': form})
+
+@login_required
+def delete_category(request, id):
+    category = get_object_or_404(Category, id=id, vendor=request.user)
+    if request.method == 'POST':
+        category.delete()
+        return redirect('category_list')
+    return render(request, 'product/confirm_delete.html', {'category': category})
+
+@login_required
+def edit_product(request, id):
+    product = get_object_or_404(Product, id=id, vendor=request.user)
+    if request.method == 'POST':
+        form = ProductForm(request.POST, request.FILES, instance=product)
+        if form.is_valid():
+            form.save()
+            return redirect('product_list')
+    else:
+        form = ProductForm(instance=product)
+    return render(request, 'product/edit_product.html', {'form': form})
+
+@login_required
+def delete_product(request, id):
+    product = get_object_or_404(Product, id=id, vendor=request.user)
+    if request.method == 'POST':
+        product.delete()
+        return redirect('product_list')
+    return render(request, 'product/confirm_delete.html', {'product': product})
